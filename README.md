@@ -12,12 +12,15 @@ When the broker is re-established, then creating a new sender will succeed with 
 
 # Prerequisites
 The following packages should be installed:
+
 * qpid-proton-c
 * qpid-proton-cpp
 * qpid-dispatch-router
 * qpid-dispatch-tools (optional)
 * python3-qpid-proton (required by qpid-dispatch-tools)
+
 and necessary tools such as:
+
 * make
 * cmake
 * gcc-c++
