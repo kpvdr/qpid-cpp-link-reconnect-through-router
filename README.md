@@ -25,7 +25,7 @@ and necessary tools such as:
 * cmake
 * gcc-c++
 
-# How to run the test
+# How to run the test (using Makefile)
 Use `make --help` to see a synopsis.
 
 1. Start broker:
@@ -36,6 +36,47 @@ Use `make --help` to see a synopsis.
 1. Run client:
    `make send`
    This will build, then send 20 messages at 1 second intervals.
+
+# How to run the test without Makefile
+
+1. Build the client:
+    ```
+    mkdir bld
+    cd bld
+    cmake ..
+    make
+    cd ..
+    ```
+1. Start the broker in a new bash terminal:
+    ```
+    ./scripts/start-broker.sh
+    ```
+1. Start the router node(s) in a new bash terminal each:
+    For single node case:
+    ```
+    qdrouterd --conf single-node.conf
+    ```
+    For two node case:
+    ```
+    qdrouterd --conf dual-node-broker-side.conf
+    ```
+    and
+    ```
+    qdrouterd --conf dual-node-client-side.conf
+    ```
+1. Run the client:
+    ```
+    ./bld/sender -a amqp://127.0.0.1/link1.test -m 20
+    ```
+1. Stop then restart the broker
+    In the broker window:
+    ```
+    ^C
+    <broker stops>
+    ./scripts/start-broker.sh
+    <broker starts>
+    ```
+1. Check the client window for successful sender restart and for message sending to continue where it was interrupted.
 
 # Expected output
 ```
