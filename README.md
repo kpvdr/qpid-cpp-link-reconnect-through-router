@@ -25,7 +25,7 @@ and necessary tools such as:
 * cmake
 * gcc-c++
 
-# How to run the test (using Makefile)
+# How to run the test using Makefile
 Use `make --help` to see a synopsis.
 
 1. Start broker:
@@ -50,6 +50,9 @@ Use `make --help` to see a synopsis.
     ```
     ^C
     <broker stops>
+    ```
+    Check the client window to see that the client has entered a loop attempting to restart the sender. Then restart the broker:
+    ```
     ./scripts/start-broker.sh
     <broker starts>
     ```
@@ -92,12 +95,15 @@ Use `make --help` to see a synopsis.
     ./bld/sender -a amqp://127.0.0.1/link1.test -m 20
     ```
 
-1. Stop then restart the broker
+1. Stop the broker while the client is sending, then restart it:
 
     In the broker window:
     ```
     ^C
     <broker stops>
+    ```
+    Check the client window to see that the client has entered a loop attempting to restart the sender. Then restart the broker:
+    ```
     ./scripts/start-broker.sh
     <broker starts>
     ```
