@@ -29,13 +29,32 @@ and necessary tools such as:
 Use `make --help` to see a synopsis.
 
 1. Start broker:
+
    `make start-broker` will create a new broker instance, modify it to listen on port 9001 and start it in a new interactive terminal window. This allows the user to stop the broker and restart it at will using command `scripts/start-broker.sh`. Type `exit` to close the window once the broker is stopped.
+
 1. Start router(s):
-   For the one-node test, `make start-router`
-   For the two-node test, `make start-b-router`, then `make start-c-router`
+
+   For the one-node test, `make start-router` in a new window.
+
+   or
+
+   For the two-node test, `make start-b-router`, then `make start-c-router` in a new window each.
+
 1. Run client:
-   `make send`
-   This will build, then send 20 messages at 1 second intervals.
+
+   `make send` will build, start the client. It will send 20 messages at 1 second intervals.
+
+1. Stop the broker while the client is sending, then restart it:
+
+    Find the broker window, then:
+    ```
+    ^C
+    <broker stops>
+    ./scripts/start-broker.sh
+    <broker starts>
+    ```
+
+1. Check the client window for successful sender restart and for message sending to continue where it was interrupted.
 
 # How to run the test without Makefile
 
@@ -51,6 +70,7 @@ Use `make --help` to see a synopsis.
     ```
     ./scripts/start-broker.sh
     ```
+    This will create a new broker instance (if it does not exist), modify it to listen on port 9001, then start it.
 
 1. Start the router node(s) in a new bash terminal each:
 
