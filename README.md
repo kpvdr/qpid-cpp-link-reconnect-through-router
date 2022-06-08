@@ -51,7 +51,9 @@ Use `make --help` to see a synopsis.
     ```
     ./scripts/start-broker.sh
     ```
+
 1. Start the router node(s) in a new bash terminal each:
+
     For single node case:
     ```
     qdrouterd --conf single-node.conf
@@ -64,11 +66,14 @@ Use `make --help` to see a synopsis.
     ```
     qdrouterd --conf dual-node-client-side.conf
     ```
+
 1. Run the client:
     ```
     ./bld/sender -a amqp://127.0.0.1/link1.test -m 20
     ```
+
 1. Stop then restart the broker
+
     In the broker window:
     ```
     ^C
