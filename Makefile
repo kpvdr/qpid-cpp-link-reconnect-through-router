@@ -29,7 +29,10 @@ help:
 	@echo "  start-router        Start router (1-node case) in new terminal window"
 	@echo "  send                Build cleint, then send 20 messages to broker through router(s)"
 	@echo
-	@echo "Demo configuration:"
+	@echo "Demo single-node configuration:"
+	@echo "  sender --[5672]--> router --[9001]--> broker"
+	@echo
+	@echo "Demo dual-node configuration:"
 	@echo "  sender --[5672]--> c-router --[8001]--> b-router --[9001]--> broker"
 	@echo
 	@echo "Suggested execution for 2-node router case:"

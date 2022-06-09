@@ -11,19 +11,33 @@ When the broker fails, the sender is closed. The on_sender_close() callback is u
 When the broker is re-established, then creating a new sender will succeed with credit, and will remain open. The sender can then resume sending messages.
 
 # Prerequisites
+
+## Fedora
 The following packages should be installed:
 
 * qpid-proton-c
+* qpid-proton-c-devel
 * qpid-proton-cpp
+* qpid-proton-cpp-devel
 * qpid-dispatch-router
-* qpid-dispatch-tools (optional)
 * python3-qpid-proton (required by qpid-dispatch-tools)
+* qpid-dispatch-tools (optional)
 
 and necessary tools such as:
 
 * make
 * cmake
 * gcc-c++
+* valgrind
+
+This can be achieved with:
+```
+sudo dnf install qpid-dispatch-router qpid-proton-cpp-devel cmake gcc-c++ valgrind
+```
+and the remaining packages are automatically installed from dependencies.
+
+## Other distros
+I have neither tested nor run other distros at this time. Some tweaking of package names may be required.
 
 # How to run the test using Makefile
 Use `make --help` to see a synopsis.

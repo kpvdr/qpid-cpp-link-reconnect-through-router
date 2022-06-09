@@ -44,18 +44,20 @@ class simple_send : public proton::messaging_handler {
     std::string user;
     std::string password;
     bool reconnect;
+    int burst_size;
     proton::sender sender;
     int sent;
     int accepted;
     int rejected;
     int released;
     int total;
-    proton::duration interval_1sec;
+    proton::duration send_interval;
+    proton::duration sender_retry_interval;
 
   public:
-    simple_send(const std::string &s, const std::string &u, const std::string &p, bool r, int c) :
-        url(s), user(u), password(p), reconnect(r), sent(0), accepted(0), rejected(0), released(0),
-        total(c), interval_1sec(1 * proton::duration::SECOND) {}
+    simple_send(const std::string &s, const std::string &u, const std::string &p, bool r, int c, int si, int sri, int b) :
+        url(s), user(u), password(p), reconnect(r), burst_size(b), sent(0), accepted(0), rejected(0), released(0), total(c),
+        send_interval(si * proton::duration::MILLISECOND), sender_retry_interval(sri * proton::duration::MILLISECOND) {}
 
     void on_container_start(proton::container &c) override {
         proton::connection_options co;
@@ -77,7 +79,7 @@ class simple_send : public proton::messaging_handler {
         sent = accepted;   // Re-send unaccepted messages after a reconnect
         if (s.credit()) {
             std::cout << "credit=true " << std::endl;
-            s.work_queue().schedule(interval_1sec, [=] { send(s); });
+            s.work_queue().schedule(send_interval, [=] { send(s); });
         } else {
             std::cout << "credit=false " << std::endl;
         }
@@ -89,23 +91,27 @@ class simple_send : public proton::messaging_handler {
 
     void send(proton::sender s) {
         if (s.active() && s.credit() && sent < total) {
-            proton::message msg;
-            std::map<std::string, int> m;
-            m["sequence"] = sent + 1;
+            int burst_count = 0;
+            while (burst_count < burst_size && s.credit() && sent < total) {
+                proton::message msg;
+                std::map<std::string, int> m;
+                m["sequence"] = sent + 1;
 
-            msg.id(sent + 1);
-            msg.body(m);
+                msg.id(sent + 1);
+                msg.body(m);
 
-            s.send(msg);
-            sent++;
-            std::cout << "sent=" << sent << std::endl;
-            s.work_queue().schedule(interval_1sec, [=] { send(s); });
+                s.send(msg);
+                sent++;
+                std::cout << "sent=" << sent << std::endl;
+                burst_count++;
+            }
+            s.work_queue().schedule(send_interval, [=] { send(s); });
         }
     }
 
     void on_sender_close(proton::sender &s) override {
         std::cout << "on_sender_close" << std::endl;
-        s.work_queue().schedule(interval_1sec, [=] { reopen_sender(s); });
+        s.work_queue().schedule(sender_retry_interval, [=] { reopen_sender(s); });
     }
 
     void reopen_sender(proton::sender s) {
@@ -160,6 +166,9 @@ int main(int argc, char **argv) {
     std::string password;
     bool reconnect = false;
     int message_count = 100;
+    int send_interval_ms = 1000;
+    int sender_retry_interval_ms = 2000;
+    int burst_size = 1;
     example::options opts(argc, argv);
 
     opts.add_value(address, 'a', "address", "connect and send to URL", "URL");
@@ -167,6 +176,9 @@ int main(int argc, char **argv) {
     opts.add_value(password, 'p', "password", "authenticate with PASSWORD", "PASSWORD");
     opts.add_flag(reconnect, 'r', "reconnect", "reconnect on connection failure");
     opts.add_value(message_count, 'm', "messages", "send COUNT messages", "COUNT");
+    opts.add_value(send_interval_ms, 'i', "interval", "Send BURST messages every INT milliseconds", "INT");
+    opts.add_value(sender_retry_interval_ms, 's', "sender-retry-interval", "Retry to open sender every INT milliseconds when link drops", "INT");
+    opts.add_value(burst_size, 'b', "burst", "send BURST messages at a time each interval", "BURST");
 
     try {
         opts.parse();
@@ -176,8 +188,11 @@ int main(int argc, char **argv) {
         std::cout << "password: " << password << std::endl;
         std::cout << "reconnect: " << (reconnect?"T":"F") << std::endl;
         std::cout << "message_count: " << message_count << std::endl;
+        std::cout << "send_interval_ms: " << send_interval_ms << std::endl;
+        std::cout << "sender_retry_interval_ms: " << sender_retry_interval_ms << std::endl;
+        std::cout << "burst_size: " << burst_size << std::endl;
 
-        simple_send send(address, user, password, reconnect, message_count);
+        simple_send send(address, user, password, reconnect, message_count, send_interval_ms, sender_retry_interval_ms, burst_size);
         proton::container(send).run();
 
         return 0;
