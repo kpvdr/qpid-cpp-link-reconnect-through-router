@@ -119,22 +119,33 @@ Use `make --help` to see a synopsis.
       -h, --help
             Print the help message
       -a URL, --address=URL
-            connect and send to URL (default )
+            Connect and send to URL (default )
       -u USER, --user=USER
-            authenticate as USER (default )
-      -p PASSWORD, --password=PASSWORD
-            authenticate with PASSWORD (default )
+            Authenticate as USER (default )
+      -p PWD, --password=PWD
+            Authenticate with PWD (default )
       -r, --reconnect
-            reconnect on connection failure
+            Reconnect on connection failure
       -m COUNT, --messages=COUNT
-            send COUNT messages (default 100)
+            Send COUNT messages (default 100)
       -i INT, --interval=INT
             Send BURST messages every INT milliseconds (default 1000)
       -s INT, --sender-retry-interval=INT
             Retry to open sender every INT milliseconds when link drops (default 2000)
-      -b BURST, --burst=BURST
-            send BURST messages at a time each interval (default 1)
+      -b COUNT, --burst=COUNT
+            Send COUNT messages at a time each interval (default 1)
     ```
+    | Short | Long | Description | Default | Req'd |
+    | --- | --- | --- | --- | --- |
+    | -h | --help | Print the help message |  |  |
+    | -a URL | --address URL | Connect and send to URL |  | Y |
+    | -u USER | --user USER | Authenticate as USER |  |  |
+    | -p PWD | --password PWD | Authenticate with PASSWORD |  |  |
+    | -r | --reconnect | Reconnect on connection failure | N |  |
+    | -m COUNT | --messages COUNT | Send COUNT total messages | 100 |  |
+    | -i INT | --interval INT | Send BURST messages every INT milliseconds | 1000 |  |
+    | -s INT | --sender-retry-interval INT | Retry to open sender every INT milliseconds when link drops | 2000 |  |
+    | -b COUNT | --burst COUNT | Send BURST messages at a time each interval | 1 |  |
 
 1. Stop the broker while the client is sending, then restart it:
 

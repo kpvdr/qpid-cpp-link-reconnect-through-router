@@ -171,14 +171,14 @@ int main(int argc, char **argv) {
     int burst_size = 1;
     example::options opts(argc, argv);
 
-    opts.add_value(address, 'a', "address", "connect and send to URL", "URL");
-    opts.add_value(user, 'u', "user", "authenticate as USER", "USER");
-    opts.add_value(password, 'p', "password", "authenticate with PASSWORD", "PASSWORD");
-    opts.add_flag(reconnect, 'r', "reconnect", "reconnect on connection failure");
-    opts.add_value(message_count, 'm', "messages", "send COUNT messages", "COUNT");
+    opts.add_value(address, 'a', "address", "Connect and send to URL", "URL");
+    opts.add_value(user, 'u', "user", "Authenticate as USER", "USER");
+    opts.add_value(password, 'p', "password", "Authenticate with PWD", "PWD");
+    opts.add_flag(reconnect, 'r', "reconnect", "Reconnect on connection failure");
+    opts.add_value(message_count, 'm', "messages", "Send COUNT messages", "COUNT");
     opts.add_value(send_interval_ms, 'i', "interval", "Send BURST messages every INT milliseconds", "INT");
     opts.add_value(sender_retry_interval_ms, 's', "sender-retry-interval", "Retry to open sender every INT milliseconds when link drops", "INT");
-    opts.add_value(burst_size, 'b', "burst", "send BURST messages at a time each interval", "BURST");
+    opts.add_value(burst_size, 'b', "burst", "Send COUNT messages at a time each interval", "COUNT");
 
     try {
         opts.parse();
