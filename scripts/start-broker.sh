@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-RH_CORE_DIR=${HOME}/RedHat/rh-core
-INSTALL_DIR=${RH_CORE_DIR}/install
-#PATH=${PATH}:${INSTALL_DIR}/sbin:${INSTALL_DIR}/bin
-#PYTHONPATH=${INSTALL_DIR}/lib64/python3.10/site-packages:${INSTALL_DIR}/lib/python3.10/site-packages
+# Download Artemis from https://activemq.apache.org/components/artemis/download/
+# Adjust this location if necessary:
+ARTEMIS_INSTALL_DIR=${HOME}/Downloads/apache-artemis-2.22.0-bin
 
 # Install broker instance (if not already done)
 
 if [[ -d broker ]]; then
+    # Broker instance found
     if [[ -e broker/bin/artemis-service ]]; then
         echo "Artemis broker found"
     else
@@ -15,17 +15,22 @@ if [[ -d broker ]]; then
         exit 1
     fi
 else
-    ARTEMIS_DIR=`ls -d ${RH_CORE_DIR}/activemq-artemis/artemis-distribution/target/apache-artemis*-bin`
+    # No broker instance found - create it from the installed Artemis location
+    ARTEMIS_DIR=`ls -d ${ARTEMIS_INSTALL_DIR}/apache-artemis*`
     echo "ARTEMIS_DIR=${ARTEMIS_DIR}"
     ARTEMIS_BASE_DIR=${ARTEMIS_DIR##*/}
     echo "ARTEMIS_BASE_DIR=${ARTEMIS_BASE_DIR}"
-    ARTEMIS_VER=${ARTEMIS_BASE_DIR%-*}
+    if [[ ${ARTEMIS_BASE_DIR} == *-SNAPSHOT ]]; then
+        ARTEMIS_VER=${ARTEMIS_BASE_DIR%-*}
+    else
+        ARTEMIS_VER=${ARTEMIS_BASE_DIR}
+    fi
     echo "ARTEMIS_VER=${ARTEMIS_VER}"
 
-    ${ARTEMIS_DIR}/${ARTEMIS_VER}/bin/artemis create broker --force --user admin --password admin --role amq --allow-anonymous
+    ${ARTEMIS_DIR}/bin/artemis create broker --force --user admin --password admin --role amq --allow-anonymous
 
-    # Update config file to listen on port 9001, turn off persistence
-    sed -i 's|<persistence-enabled>true</persistence-enabled>|<persistence-enabled>false</persistence-enabled>|' broker/etc/broker.xml
+    # Update broker instance config file to listen on port 9001, optionall turn off persistence
+    #sed -i 's|<persistence-enabled>true</persistence-enabled>|<persistence-enabled>false</persistence-enabled>|' broker/etc/broker.xml
     sed -i 's|<acceptor name="amqp">tcp://0.0.0.0:5672?|<acceptor name="amqp">tcp://0.0.0.0:9001?|' broker/etc/broker.xml
 fi
 
