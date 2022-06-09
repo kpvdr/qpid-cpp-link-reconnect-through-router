@@ -132,20 +132,20 @@ Use `make --help` to see a synopsis.
             Send BURST messages every INT milliseconds (default 1000)
       -s INT, --sender-retry-interval=INT
             Retry to open sender every INT milliseconds when link drops (default 2000)
-      -b COUNT, --burst=COUNT
-            Send COUNT messages at a time each interval (default 1)
+      -b BURST, --burst=BURST
+            Send BURST messages at a time each interval (default 1)
     ```
     | Short | Long | Description | Default | Req'd |
     | --- | --- | --- | --- | --- |
-    | -h | --help | Print the help message |  |  |
-    | -a URL | --address URL | Connect and send to URL |  | Y |
-    | -u USER | --user USER | Authenticate as USER |  |  |
-    | -p PWD | --password PWD | Authenticate with PASSWORD |  |  |
-    | -r | --reconnect | Reconnect on connection failure | N |  |
-    | -m COUNT | --messages COUNT | Send COUNT total messages | 100 |  |
-    | -i INT | --interval INT | Send BURST messages every INT milliseconds | 1000 |  |
-    | -s INT | --sender-retry-interval INT | Retry to open sender every INT milliseconds when link drops | 2000 |  |
-    | -b COUNT | --burst COUNT | Send BURST messages at a time each interval | 1 |  |
+    | `-h` | `--help` | Print the help message |  |  |
+    | `-a URL` | `--address URL` | Connect and send to `URL` |  | Y |
+    | `-u USER` | `--user USER` | Authenticate as `USER` |  |  |
+    | `-p PWD` | `--password PWD` | Authenticate with `PWD` |  |  |
+    | `-r` | `--reconnect` | Reconnect on connection failure | N |  |
+    | `-m COUNT` | `--messages COUNT` | Send `COUNT` total messages | 100 |  |
+    | `-i INT` | `--interval INT` | Send `BURST` messages every `INT` milliseconds | 1000 |  |
+    | `-s INT` | `--sender-retry-interval INT` | Retry to open sender every `INT` milliseconds when link drops | 2000 |  |
+    | `-b BURST` | `--burst BURST` | Send `BURST` messages at a time each interval | 1 |  |
 
 1. Stop the broker while the client is sending, then restart it:
 

@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
     opts.add_value(message_count, 'm', "messages", "Send COUNT messages", "COUNT");
     opts.add_value(send_interval_ms, 'i', "interval", "Send BURST messages every INT milliseconds", "INT");
     opts.add_value(sender_retry_interval_ms, 's', "sender-retry-interval", "Retry to open sender every INT milliseconds when link drops", "INT");
-    opts.add_value(burst_size, 'b', "burst", "Send COUNT messages at a time each interval", "COUNT");
+    opts.add_value(burst_size, 'b', "burst", "Send BURST messages at a time each interval", "BURST");
 
     try {
         opts.parse();
