@@ -17,7 +17,6 @@
 
 
 TERM:=gnome-terminal
-WAIT_FOR_EXIT:="echo 'Press Enter to exit'; read line"
 
 .PHONY: help
 help:
@@ -29,6 +28,9 @@ help:
 	@echo "  start-c-router      Start client-side router (2-node case) in new terminal window"
 	@echo "  start-router        Start router (1-node case) in new terminal window"
 	@echo "  send                Build cleint, then send 20 messages to broker through router(s)"
+	@echo
+	@echo "Demo configuration:"
+	@echo "  sender --[5672]--> c-router --[8001]--> b-router --[9001]--> broker"
 	@echo
 	@echo "Suggested execution for 2-node router case:"
 	@echo "  $$ make start-broker"
