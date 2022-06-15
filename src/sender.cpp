@@ -29,8 +29,6 @@
 #include <proton/message_id.hpp>
 #include <proton/messaging_handler.hpp>
 #include <proton/reconnect_options.hpp>
-#include <proton/sender_options.hpp>
-#include <proton/target_options.hpp>
 #include <proton/tracker.hpp>
 #include <proton/types.hpp>
 #include <proton/work_queue.hpp>
@@ -43,7 +41,7 @@
 class simple_send : public proton::messaging_handler {
   private:
     std::string ip_addr;
-    proton::sender_options sender_opts;
+    std::string amqp_addr;
     std::string user;
     std::string password;
     bool reconnect;
@@ -59,10 +57,8 @@ class simple_send : public proton::messaging_handler {
 
   public:
     simple_send(const std::string &i, const std::string &a, const std::string &u, const std::string &p, bool r, int c, int si, int sri, int b) :
-        ip_addr(i), sender_opts(), user(u), password(p), reconnect(r), burst_size(b), sent(0), accepted(0), rejected(0), released(0), total(c),
-        send_interval(si * proton::duration::MILLISECOND), sender_retry_interval(sri * proton::duration::MILLISECOND) {
-        sender_opts.target(proton::target_options().address(a));
-    }
+        ip_addr(i), amqp_addr(a), user(u), password(p), reconnect(r), burst_size(b), sent(0), accepted(0), rejected(0), released(0), total(c),
+        send_interval(si * proton::duration::MILLISECOND), sender_retry_interval(sri * proton::duration::MILLISECOND) {}
 
     void on_container_start(proton::container &c) override {
         proton::connection_options co;
@@ -70,7 +66,7 @@ class simple_send : public proton::messaging_handler {
         if (!password.empty()) co.password(password);
         co.sasl_allow_insecure_mechs(true);
         if (reconnect) co.reconnect(proton::reconnect_options());
-        c.open_sender(ip_addr, sender_opts, co);
+        c.open_sender(ip_addr + "/" + amqp_addr, co);
     }
 
     void on_connection_open(proton::connection& c) override {
@@ -122,7 +118,7 @@ class simple_send : public proton::messaging_handler {
     void reopen_sender(proton::sender s) {
         std::cout << "reopen_sender";
         if (accepted != total) {
-            s.connection().open_sender(ip_addr, sender_opts);
+            s.connection().open_sender(amqp_addr);
             sent = accepted;   // Re-send unaccepted messages after a reconnect
             std::cout << " - reopening sender, sent reset to " << sent;
         }
