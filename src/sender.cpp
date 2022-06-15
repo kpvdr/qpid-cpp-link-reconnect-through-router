@@ -29,6 +29,8 @@
 #include <proton/message_id.hpp>
 #include <proton/messaging_handler.hpp>
 #include <proton/reconnect_options.hpp>
+#include <proton/sender_options.hpp>
+#include <proton/target_options.hpp>
 #include <proton/tracker.hpp>
 #include <proton/types.hpp>
 #include <proton/work_queue.hpp>
@@ -40,7 +42,8 @@
 
 class simple_send : public proton::messaging_handler {
   private:
-    std::string url;
+    std::string ip_addr;
+    proton::sender_options sender_opts;
     std::string user;
     std::string password;
     bool reconnect;
@@ -55,9 +58,11 @@ class simple_send : public proton::messaging_handler {
     proton::duration sender_retry_interval;
 
   public:
-    simple_send(const std::string &s, const std::string &u, const std::string &p, bool r, int c, int si, int sri, int b) :
-        url(s), user(u), password(p), reconnect(r), burst_size(b), sent(0), accepted(0), rejected(0), released(0), total(c),
-        send_interval(si * proton::duration::MILLISECOND), sender_retry_interval(sri * proton::duration::MILLISECOND) {}
+    simple_send(const std::string &i, const std::string &a, const std::string &u, const std::string &p, bool r, int c, int si, int sri, int b) :
+        ip_addr(i), sender_opts(), user(u), password(p), reconnect(r), burst_size(b), sent(0), accepted(0), rejected(0), released(0), total(c),
+        send_interval(si * proton::duration::MILLISECOND), sender_retry_interval(sri * proton::duration::MILLISECOND) {
+        sender_opts.target(proton::target_options().address(a));
+    }
 
     void on_container_start(proton::container &c) override {
         proton::connection_options co;
@@ -65,7 +70,7 @@ class simple_send : public proton::messaging_handler {
         if (!password.empty()) co.password(password);
         co.sasl_allow_insecure_mechs(true);
         if (reconnect) co.reconnect(proton::reconnect_options());
-        c.open_sender(url, co);
+        c.open_sender(ip_addr, sender_opts, co);
     }
 
     void on_connection_open(proton::connection& c) override {
@@ -117,7 +122,7 @@ class simple_send : public proton::messaging_handler {
     void reopen_sender(proton::sender s) {
         std::cout << "reopen_sender";
         if (accepted != total) {
-            s.connection().open_sender(url);
+            s.connection().open_sender(ip_addr, sender_opts);
             sent = accepted;   // Re-send unaccepted messages after a reconnect
             std::cout << " - reopening sender, sent reset to " << sent;
         }
@@ -161,7 +166,8 @@ class simple_send : public proton::messaging_handler {
 };
 
 int main(int argc, char **argv) {
-    std::string address;
+    std::string ip_addr("amqp://127.0.0.1");
+    std::string amqp_addr;
     std::string user;
     std::string password;
     bool reconnect = false;
@@ -171,7 +177,8 @@ int main(int argc, char **argv) {
     int burst_size = 1;
     example::options opts(argc, argv);
 
-    opts.add_value(address, 'a', "address", "Connect and send to URL", "URL");
+    opts.add_value(ip_addr, 'i', "ip_addr", "connect to broker/router at IP addr IPADDR", "IPADDR");
+    opts.add_value(amqp_addr, 'a', "amqp_addr", "send messages to AMQP address AMQPADDR", "AMQPADDR");
     opts.add_value(user, 'u', "user", "Authenticate as USER", "USER");
     opts.add_value(password, 'p', "password", "Authenticate with PWD", "PWD");
     opts.add_flag(reconnect, 'r', "reconnect", "Reconnect on connection failure");
@@ -183,7 +190,7 @@ int main(int argc, char **argv) {
     try {
         opts.parse();
 
-        std::cout << "address: " << address << std::endl;
+        std::cout << "address: " << ip_addr << "/" << amqp_addr << std::endl;
         std::cout << "user: " << user << std::endl;
         std::cout << "password: " << password << std::endl;
         std::cout << "reconnect: " << (reconnect?"T":"F") << std::endl;
@@ -192,7 +199,7 @@ int main(int argc, char **argv) {
         std::cout << "sender_retry_interval_ms: " << sender_retry_interval_ms << std::endl;
         std::cout << "burst_size: " << burst_size << std::endl;
 
-        simple_send send(address, user, password, reconnect, message_count, send_interval_ms, sender_retry_interval_ms, burst_size);
+        simple_send send(ip_addr, amqp_addr, user, password, reconnect, message_count, send_interval_ms, sender_retry_interval_ms, burst_size);
         proton::container(send).run();
 
         return 0;
