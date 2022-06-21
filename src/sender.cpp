@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
     try {
         opts.parse();
 
-        std::cout << "address: " << ip_addr << "/" << amqp_addr << std::endl;
+        std::cout << "address_url: " << ip_addr << "/" << amqp_addr << std::endl;
         std::cout << "user: " << user << std::endl;
         std::cout << "password: " << password << std::endl;
         std::cout << "reconnect: " << (reconnect?"T":"F") << std::endl;
