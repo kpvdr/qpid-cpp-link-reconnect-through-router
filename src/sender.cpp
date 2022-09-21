@@ -78,20 +78,16 @@ class simple_send : public proton::messaging_handler {
     void on_sender_open(proton::sender &s) override {
 	    std::cout << "on_sender_open: ";
         sent = accepted;   // Re-send unaccepted messages after a reconnect
-        if (s.credit()) {
-            std::cout << "credit=true " << std::endl;
-            s.work_queue().schedule(send_interval, [=] { send(s); });
-        } else {
-            std::cout << "credit=false " << std::endl;
-        }
     }
 
     void on_sendable(proton::sender &s) override {
         std::cout << "on_sendable" << std::endl;
+        s.work_queue().schedule(send_interval, [=] { send(s); });
     }
 
     void send(proton::sender s) {
         if (s.active() && s.credit() && sent < total) {
+            std::cout << "credit=" << s.credit() << " ";
             int burst_count = 0;
             while (burst_count < burst_size && s.credit() && sent < total) {
                 proton::message msg;
@@ -106,7 +102,6 @@ class simple_send : public proton::messaging_handler {
                 std::cout << "sent=" << sent << std::endl;
                 burst_count++;
             }
-            s.work_queue().schedule(send_interval, [=] { send(s); });
         }
     }
 

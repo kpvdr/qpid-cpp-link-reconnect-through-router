@@ -21,11 +21,12 @@ TERM:=gnome-terminal
 .PHONY: help
 help:
 	@echo "Demo of Qpid C++ link restart on existing connection:"
+	@echo "make options:"
 	@echo "  build:              Build test"
 	@echo "  clean:              Delete bld directory with all build artifacts"
 	@echo "  start-broker        Start Artemis broker in new *interactive* terminal window"
-	@echo "  start-b-router      Start broker-side router (2-node case) in new terminal window"
-	@echo "  start-c-router      Start client-side router (2-node case) in new terminal window"
+	@echo "  start-b-router      Start broker-side router (dual-node case) in new terminal window"
+	@echo "  start-c-router      Start client-side router (dual-node case) in new terminal window"
 	@echo "  start-router        Start router (1-node case) in new terminal window"
 	@echo "  send                Build cleint, then send 20 messages to broker through router(s)"
 	@echo
@@ -35,14 +36,22 @@ help:
 	@echo "Demo dual-node configuration:"
 	@echo "  sender --[5672]--> c-router --[8001]--> b-router --[9001]--> broker"
 	@echo
-	@echo "Suggested execution for 2-node router case:"
+	@echo "Suggested execution for single-node router case:"
+	@echo "  $$ make start-broker"
+	@echo "  $$ make start-router"
+	@echo "  $$ make send"
+	@echo
+	@echo "Suggested execution for dual-node router case:"
 	@echo "  $$ make start-broker"
 	@echo "  $$ make start-b-router"
 	@echo "  $$ make start-c-router"
 	@echo "  $$ make send"
-	@echo "  When messages are being sent, go to broker window, ^C broker,"
+	@echo
+	@echo "  While messages are being sent, go to broker window, ^C broker,"
 	@echo "    then restart broker with 'scripts/start-broker.sh'"
 	@echo "  Watch this window for link restore and continuation of message sending"
+	@echo "  When all messages are received, ^C the routers and broker. To close the"
+	@echo "  broker window, use \"exit\"."
 
 
 .PHONY: clean
